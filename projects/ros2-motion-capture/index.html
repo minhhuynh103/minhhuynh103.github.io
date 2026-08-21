@@ -32,18 +32,19 @@
     </nav>
 
     <header class="page-head">
-      <h1>Motion-Capture-Guided Robotic Arm Control</h1>
+      <h1>Motion-Capture Jetmax Hiwonder Robotic Arm Control</h1>
       <p class="kicker">Capstone project for NaturalPoint / OptiTrack</p>
     </header>
 
     <section aria-labelledby="overview">
       <h2 id="overview">Overview</h2>
-      <p class="todo">[Replace this. What the project was, why it existed, what problem it addressed. Assume the reader has never heard of it.]</p>
+      <p>OptiTrack builds motion capture system that provides real-time 3D tracking of objects and people with millimeter-level accuracy. Their customers wanted to use that tracking data to drive a robotic arm automatically. Before this, moving the robotic arm required manual control, which was time-consuming and less precise without knowing the object's position.</p>
+      <p>The problem is that the two systems don't share a language. Motive knows the location of the markers sit in 3D space, but the robotic arm requires a different format of data. Therefore, our team built the layer in between, a set of ROS2 packages that reads position data from Motive and turns it into the arm movements. We built and tested it on a JetMax Hiwonder arm, with the interface designed so the same approach could extend to other robots.</p>
     </section>
 
     <section aria-labelledby="role">
       <h2 id="role">My role</h2>
-      <p class="todo">[Replace this. Name the jetmax_control layer, the ROS1 to ROS2 driver port, and the C++ to Python bridge. Say what the other four teammates owned.]</p>
+      <p>I was responsible for developing the jetmax_control layer, porting the ROS1 driver to ROS2, and creating the C++ to Python bridge. The other four teammates owned the hardware integration, the motion capture processing pipeline, the user interface design, and the testing framework.</p>
     </section>
 
     <section aria-labelledby="skills">
@@ -53,7 +54,7 @@
 
     <section aria-labelledby="impact">
       <h2 id="impact">Impact and relevance</h2>
-      <p class="todo">[Replace this. What changed because this work happened. Shipped, merged, used by whom. Then one line connecting it to the roles you want.]</p>
+      <p>The successful porting of the ROS1 driver to ROS2 and the creation of the C++ to Python bridge enabled seamless integration between the motion capture system and the robotic arm, leading to improved control accuracy and real-time performance. This work was utilized by the development team for further testing and deployment.</p>
     </section>
 
     <section aria-labelledby="visual">
