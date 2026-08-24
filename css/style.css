@@ -205,6 +205,7 @@ main { padding-block: 3rem 4rem; }
 /* --- 9. Lists and figures --------------------------------- */
 .pill-list, .contact-list { display: grid; gap: 0.5rem; margin-top: 1rem; }
 .pill-list li { padding-left: 1.1rem; position: relative; }
+.pill-list { margin-bottom: 1.5rem; }
 .pill-list li::before {
   content: "";
   position: absolute; left: 0; top: 0.7em;
