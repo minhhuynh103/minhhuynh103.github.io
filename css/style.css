@@ -2,22 +2,34 @@
    Minh Huynh — portfolio stylesheet
    Structure first. Every visual decision lives in the tokens
    below, so you can change the whole look from one block.
+
+   Palette: warm beige paper with a deep green accent.
+   All text pairs meet WCAG AA; most meet AAA.
    ============================================================ */
 
 /* --- 1. Design tokens ------------------------------------- */
 :root {
-  /* Colour. All text pairs below meet WCAG AA on --bg.
+  /* Colour. Contrast ratios noted against --bg.
      If you change these, re-check with a contrast checker. */
-  --bg:        #ffffff;
-  --bg-sunk:   #f4f5f6;   /* cards, quiet panels */
-  --ink:       #15181c;   /* body text        16.7:1 on --bg */
-  --ink-muted: #545d69;   /* captions, meta    6.6:1 on --bg */
-  --accent:    #0b5f55;   /* links, emphasis   7.1:1 on --bg */
-  --accent-hi: #084842;   /* hover */
-  --rule:      #dfe2e5;
+  --bg:          #faf7f2;   /* warm paper */
+  --bg-tint:     #f5efe5;   /* hero wash, quiet bands */
+  --surface:     #fffdfa;   /* cards sit above the page */
+  --bg-sunk:     #f2ece2;   /* recessed panels */
+  --ink:         #1c1a17;   /* body text        16.3:1 */
+  --ink-muted:   #5a5349;   /* captions, meta    7.1:1 */
+  --accent:      #0f5045;   /* links, emphasis   8.7:1 */
+  --accent-hi:   #0a3b33;   /* hover            11.7:1 */
+  --accent-soft: #e4ede9;   /* accent-tinted fill */
+  --rule:        #e3dbcf;   /* hairline dividers */
+  --rule-strong: #cfc2ae;   /* card edges */
 
-  /* Type. Swap these two lines to change the whole voice.
-     For a web font, add a <link> in each page <head> first. */
+  /* Elevation. Warm-tinted shadows, never pure black. */
+  --shadow-1: 0 1px 2px rgba(60, 46, 26, 0.05),
+              0 2px 6px rgba(60, 46, 26, 0.04);
+  --shadow-2: 0 2px 4px rgba(60, 46, 26, 0.06),
+              0 10px 24px rgba(60, 46, 26, 0.09);
+
+  /* Type. Swap these two lines to change the whole voice. */
   --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
@@ -32,6 +44,13 @@
   --measure: 68ch;        /* readable line length */
   --wrap: 60rem;
   --gap: 1.5rem;
+  --radius: 10px;
+
+  /* Motion. One curve, three speeds, so everything feels related. */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --fast: 140ms;
+  --mid:  260ms;
+  --slow: 620ms;
 }
 
 /* --- 2. Reset --------------------------------------------- */
@@ -39,6 +58,7 @@
 body, h1, h2, h3, p, ul, ol, figure, blockquote { margin: 0; }
 ul { padding: 0; list-style: none; }
 img { max-width: 100%; height: auto; display: block; }
+html { scroll-behavior: smooth; }
 
 /* --- 3. Base ---------------------------------------------- */
 body {
@@ -46,8 +66,18 @@ body {
   font-size: var(--step-0);
   line-height: 1.65;
   color: var(--ink);
-  background: var(--bg);
+  background-color: var(--bg);
+  /* Two very soft washes so the page is not a flat block of beige. */
+  background-image:
+    radial-gradient(58rem 34rem at 88% -6%, rgba(15, 80, 69, 0.06), transparent 62%),
+    radial-gradient(46rem 30rem at -8% 4%, rgba(196, 168, 122, 0.15), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
+  /* Footer stays pinned to the bottom on short pages. */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 h1, h2, h3 {
@@ -60,17 +90,34 @@ h1 { font-size: var(--step-3); }
 h2 { font-size: var(--step-2); margin-block: 2.75rem 0.75rem; }
 h3 { font-size: var(--step-1); }
 
+/* A short accent rule under section headings. Decorative only. */
+main h2::after {
+  content: "";
+  display: block;
+  width: 2.25rem;
+  height: 3px;
+  margin-top: 0.6rem;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: 0.75;
+}
+main h2.visually-hidden::after { display: none; }
+
 p, li { max-width: var(--measure); }
 p + p { margin-top: 1rem; }
 
-a { color: var(--accent); text-underline-offset: 0.18em; }
+a {
+  color: var(--accent);
+  text-underline-offset: 0.18em;
+  transition: color var(--fast) var(--ease);
+}
 a:hover { color: var(--accent-hi); }
 
 /* Visible focus. Do not remove. */
 :focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .wrap {
@@ -87,7 +134,7 @@ a:hover { color: var(--accent-hi); }
   background: var(--ink);
   color: #fff;
   padding: 0.75rem 1.25rem;
-  z-index: 100;
+  z-index: 200;
 }
 .skip-link:focus {
   left: 0;
@@ -96,9 +143,29 @@ a:hover { color: var(--accent-hi); }
 
 /* --- 5. Header and nav ------------------------------------ */
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   border-bottom: 1px solid var(--rule);
-  padding-block: 1.25rem;
+  padding-block: 1.1rem;
+  background: rgba(250, 247, 242, 0.82);
+  -webkit-backdrop-filter: saturate(1.4) blur(10px);
+  backdrop-filter: saturate(1.4) blur(10px);
+  transition: box-shadow var(--mid) var(--ease),
+              padding var(--mid) var(--ease),
+              background-color var(--mid) var(--ease);
 }
+/* .is-stuck is added by js/enhance.js once the page scrolls. */
+.site-header.is-stuck {
+  box-shadow: var(--shadow-1);
+  padding-block: 0.7rem;
+  background: rgba(250, 247, 242, 0.94);
+}
+/* No blur support: fall back to an opaque bar so text stays legible. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .site-header { background: var(--bg); }
+}
+
 .header-inner {
   display: flex;
   flex-wrap: wrap;
@@ -111,7 +178,10 @@ a:hover { color: var(--accent-hi); }
   font-size: var(--step-1);
   color: var(--ink);
   text-decoration: none;
+  transition: color var(--fast) var(--ease);
 }
+.brand:hover { color: var(--accent); }
+
 .nav {
   display: flex;
   flex-wrap: wrap;
@@ -119,21 +189,36 @@ a:hover { color: var(--accent-hi); }
   font-size: var(--step--1);
 }
 .nav a {
+  position: relative;
   color: var(--ink-muted);
   text-decoration: none;
   padding-block: 0.25rem;
-  border-bottom: 2px solid transparent;
+  transition: color var(--fast) var(--ease);
+}
+/* Underline grows out from the centre on hover. */
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  transform: translateX(-50%);
+  transition: width var(--mid) var(--ease);
 }
 .nav a:hover { color: var(--ink); }
+.nav a:hover::after { width: 100%; }
 /* Current page is marked two ways, not by colour alone. */
 .nav a[aria-current="page"] {
   color: var(--ink);
-  border-bottom-color: var(--accent);
   font-weight: 600;
 }
+.nav a[aria-current="page"]::after { width: 100%; }
 
 /* --- 6. Page furniture ------------------------------------ */
-main { padding-block: 3rem 4rem; }
+main { padding-block: 3rem 4rem; flex: 1 0 auto; }
 .page-head { margin-bottom: 1rem; }
 .crumbs {
   font-size: var(--step--1);
@@ -151,10 +236,26 @@ main { padding-block: 3rem 4rem; }
 }
 .kicker { color: var(--ink-muted); margin-top: 0.5rem; }
 .lede { font-size: var(--step-1); line-height: 1.5; margin-top: 1rem; }
-.skills { color: var(--ink-muted); }
+.skills {
+  color: var(--ink-muted);
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  padding: 0.85rem 1.1rem;
+  max-width: var(--measure);
+}
 
-.hero { padding-block: 2rem 1rem; }
+/* Hero sits in a soft tinted card so the homepage has a focal point. */
+.hero {
+  padding: 2.75rem 2.25rem 2.5rem;
+  margin-top: 0.5rem;
+  background: linear-gradient(160deg, var(--bg-tint), rgba(255, 253, 250, 0.6) 70%);
+  border: 1px solid var(--rule);
+  border-radius: 16px;
+  box-shadow: var(--shadow-1);
+}
 .hero h1 { font-size: var(--step-4); }
+.hero .lede { max-width: 54ch; }
 
 /* --- 7. Buttons ------------------------------------------- */
 .cta-row {
@@ -166,21 +267,37 @@ main { padding-block: 3rem 4rem; }
 }
 .btn {
   display: inline-block;
-  padding: 0.7rem 1.25rem;
+  padding: 0.7rem 1.35rem;
   background: var(--accent);
   color: #fff;
   text-decoration: none;
-  border-radius: 4px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   font-size: var(--step--1);
   font-weight: 600;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--fast) var(--ease),
+              box-shadow var(--fast) var(--ease),
+              background-color var(--fast) var(--ease),
+              color var(--fast) var(--ease);
 }
-.btn:hover { background: var(--accent-hi); color: #fff; }
+.btn:hover {
+  background: var(--accent-hi);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+.btn:active { transform: translateY(0); box-shadow: var(--shadow-1); }
 .btn-quiet {
-  background: transparent;
+  background: var(--surface);
   color: var(--accent);
-  border: 1px solid var(--rule);
+  border-color: var(--rule-strong);
 }
-.btn-quiet:hover { background: var(--bg-sunk); color: var(--accent-hi); }
+.btn-quiet:hover {
+  background: var(--accent-soft);
+  color: var(--accent-hi);
+  border-color: var(--accent);
+}
 
 /* --- 8. Cards --------------------------------------------- */
 .cards {
@@ -190,12 +307,37 @@ main { padding-block: 3rem 4rem; }
   margin-top: 1.5rem;
 }
 .card {
+  position: relative;
   max-width: none;
-  background: var(--bg-sunk);
-  border: 1px solid var(--rule);
-  border-radius: 6px;
-  padding: 1.5rem;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  padding: 1.6rem;
+  box-shadow: var(--shadow-1);
+  transition: transform var(--mid) var(--ease),
+              box-shadow var(--mid) var(--ease),
+              border-color var(--mid) var(--ease);
 }
+/* Accent bar wipes across the top edge on hover. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  height: 3px;
+  width: 0;
+  background: var(--accent);
+  transition: width var(--slow) var(--ease);
+}
+.card:hover,
+.card:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-2);
+  border-color: var(--accent);
+}
+.card:hover::before,
+.card:focus-within::before { width: 100%; }
+
 .card h3 { margin-bottom: 0.5rem; }
 .card h3 a { text-decoration: none; }
 .card h3 a:hover { text-decoration: underline; }
@@ -213,8 +355,32 @@ main { padding-block: 3rem 4rem; }
   background: var(--accent);
   border-radius: 50%;
 }
-figure { margin-top: 1.5rem; }
-figure img { border: 1px solid var(--rule); border-radius: 4px; }
+.contact-list li {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  transition: border-color var(--fast) var(--ease),
+              box-shadow var(--fast) var(--ease);
+}
+.contact-list li:hover {
+  border-color: var(--rule-strong);
+  box-shadow: var(--shadow-1);
+}
+
+figure { margin-top: 1.75rem; }
+figure img {
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--mid) var(--ease),
+              box-shadow var(--mid) var(--ease);
+}
+figure:hover img {
+  transform: translateY(-3px) scale(1.006);
+  box-shadow: var(--shadow-2);
+}
 figcaption {
   font-size: var(--step--1);
   color: var(--ink-muted);
@@ -224,7 +390,9 @@ figcaption {
 
 /* --- 10. Footer ------------------------------------------- */
 .site-footer {
+  margin-top: auto;
   border-top: 1px solid var(--rule);
+  background: var(--bg-tint);
   padding-block: 2rem 3rem;
   font-size: var(--step--1);
   color: var(--ink-muted);
@@ -243,33 +411,53 @@ figcaption {
   border: 0;
 }
 
-/* Placeholder marker. DELETE this rule once all [brackets] are gone —
-   if anything still shows up highlighted, you missed a spot. */
-.todo {
-  background: #fff3cd;
-  border-left: 3px solid #b8860b;
-  padding: 0.75rem 1rem;
-  color: #4a3800;
-  font-style: italic;
+/* --- 12. Reveal on scroll --------------------------------- */
+/* Progressive enhancement. Without JS, .reveal never gets .js-reveal
+   applied and everything renders visible at full opacity. */
+.js-reveal .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--slow) var(--ease),
+              transform var(--slow) var(--ease);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.js-reveal .reveal.is-visible {
+  opacity: 1;
+  transform: none;
 }
 
-/* --- 12. Small screens ------------------------------------ */
+/* --- 13. Small screens ------------------------------------ */
 @media (max-width: 40rem) {
   :root { --step-3: 2rem; --step-4: 2.35rem; --step-2: 1.5rem; }
   .header-inner { flex-direction: column; align-items: flex-start; }
   .nav { gap: 1rem 1.1rem; }
   main { padding-block: 2rem 3rem; }
+  .site-header { position: static; }
+  .hero { padding: 1.75rem 1.25rem 2rem; border-radius: 12px; }
 }
 
-/* --- 13. Preferences and print ---------------------------- */
+/* --- 14. Preferences and print ---------------------------- */
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
+  /* Never leave revealed content hidden if motion is off. */
+  .js-reveal .reveal { opacity: 1 !important; transform: none !important; }
+  .card:hover, .btn:hover, figure:hover img { transform: none !important; }
 }
+
+@media (prefers-contrast: more) {
+  :root { --rule: #b9a88e; --rule-strong: #8a7d6a; --ink-muted: #4a443b; }
+}
+
 @media print {
   .site-header, .site-footer, .skip-link, .cta-row { display: none; }
-  body { color: #000; }
+  body { color: #000; background: #fff; }
+  .hero, .card, figure img { box-shadow: none; border: 1px solid #999; }
+  .js-reveal .reveal { opacity: 1 !important; transform: none !important; }
   a::after { content: " (" attr(href) ")"; font-size: 0.85em; }
 }
